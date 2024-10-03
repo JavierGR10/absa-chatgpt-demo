@@ -1,193 +1,113 @@
 "use client";
 import Button from "@/components/Button";
 import { useChat } from "ai/react";
-import { useEffect, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { TbSend } from "react-icons/tb";
 import ReactMarkdown from "react-markdown";
-export default function Component() {
-  // const [messages, setMessages] = useState([
-  //   { role: "system", content: "Bienvenido a ABSA. ¿En qué puedo ayudarte?" },
-  // ]);
-  // const [inputMessage, setInputMessage] = useState("");
 
-  const { messages, input, handleInputChange, handleSubmit } = useChat({});
-  const textareaRef = useRef(null);
+import { Send, Menu, User, Bot } from "lucide-react";
+
+export default function Chat() {
+  // const { messages, input, handleInputChange, handleSubmit } = useChat({});
+  // const textareaRef = useRef(null);
 
   // useEffect(() => {
   //   if (textareaRef.current) {
-  //     textareaRef.current.style.height = "auto";
-  //     textareaRef.current.style.height = `${Math.min(
-  //       textareaRef.current.scrollHeight,
-  //       160
-  //     )}px`;
-  //   }
-  // }, [input]);
-
-  useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "20px";
-      const scrollHeight = textareaRef.current.scrollHeight;
-      textareaRef.current.style.height =
-        scrollHeight > 96 ? "96px" : `${scrollHeight}px`;
-    }
-  }, [input]);
-
-  // const renderThumb = ({ style, ...props }) => {
-  //   const thumbStyle = {
-  //     backgroundColor: 'rgba(255, 255, 255, 0.2)',
-  //     borderRadius: '4px',
-  //   }
-  //   return <div style={{ ...style, ...thumbStyle }} {...props} />
-  // }
-
-  // useEffect(() => {
-  //   if (textareaRef.current) {
-  //     textareaRef.current.style.height = "23px";
+  //     textareaRef.current.style.height = "20px";
   //     const scrollHeight = textareaRef.current.scrollHeight;
   //     textareaRef.current.style.height =
-  //       scrollHeight > 160 ? "160px" : `${scrollHeight}px`;
+  //       scrollHeight > 96 ? "96px" : `${scrollHeight}px`;
   //   }
   // }, [input]);
 
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault(); // Evitar que se añada un salto de línea
-      handleSubmit(); // Enviar el mensaje
-    } else if (e.key === "Enter" && e.shiftKey) {
-      // Permitir el salto de línea
-      setInput(input + "\n");
+  // const handleKeyDown = (e) => {
+  //   if (e.key === "Enter" && !e.shiftKey) {
+  //     e.preventDefault(); // Evitar que se añada un salto de línea
+  //     handleSubmit(); // Enviar el mensaje
+  //   } else if (e.key === "Enter" && e.shiftKey) {
+  //     // Permitir el salto de línea
+  //     setInput(input + "\n");
+  //   }
+  // };
+
+  const [messages, setMessages] = useState([
+    {
+      type: "bot",
+      content:
+        "¡Hola! ¿En qué puedo ayudarte hoy? La cámara tipo domo Axis M3215-LVE es una cámara de red compacta y resistente diseñada para aplicaciones de videovigilancia en exteriores. A continuación, se detallan algunas de sus especificaciones clave:Resolución: Ofrece una resolución de 2 megapíxeles (1920x1080), lo que proporciona imágenes nítidas y detalladas. Tecnología Lightfinder: Esta cámara cuenta con la tecnología Lightfinder de Axis, que permite obtener imágenes de alta calidad incluso en condiciones de poca luz. WDR y IR optimizado: La cámara está equipada con Wide Dynamic Range (WDR) para manejar condiciones de iluminación difíciles y con iluminación infrarroja (IR) optimizada para capturar imágenes claras en entornos con poca luz.",
+    },
+  ]);
+  const [input, setInput] = useState("");
+
+  const handleSubmit = () => {
+    if (input.trim()) {
+      setMessages([...messages, { type: "user", content: input }]);
+      setInput("");
+      // Aquí iría la lógica para procesar la respuesta del bot
     }
   };
 
-  return (
-    <main className="flex-grow overflow-hidden">
-      {/* <div className="h-full  flex flex-col container mx-auto px-6"> */}
-      <div className="h-full flex flex-col max-w-4xl mx-auto px-4">
-        <div className="flex-grow p-4 overflow-y-auto">
-          {messages.map((message, index) => {
-            const content =
-              typeof message.content === "string"
-                ? message.content
-                : JSON.stringify(message.content); // Convierte el objeto a string si es necesario
+  const handleInputChange = (e) => {
+    setInput(e.target.value);
+  };
 
-            return (
+  return (
+    <>
+      <main className="flex-grow overflow-auto p-4">
+        <div className="max-w-3xl mx-auto space-y-4">
+          {messages.map((message, index) => (
+            <div
+              key={index}
+              className={`flex ${
+                message.type === "user" ? "justify-end" : "justify-start"
+              }`}
+            >
               <div
-                key={index}
-                className={`mb-4 ${
-                  message.role === "user" ? "text-right" : "text-left"
+                className={`flex items-start space-x-3 max-w-[calc(100%-3rem)] ${
+                  message.type === "user"
+                    ? "flex-row-reverse space-x-reverse"
+                    : ""
                 }`}
               >
+                <div className="flex-shrink-0">
+                  {message.type === "user" ? (
+                    <User className="h-8 w-8 bg-blue-500 text-white rounded-full p-1" />
+                  ) : (
+                    <Bot className="h-8 w-8 bg-green-500 text-white rounded-full p-1" />
+                  )}
+                </div>
                 <div
-                  className={`inline-block px-4 py-2 rounded-2xl ${
-                    message.role === "user"
-                      ? "bg-[#0066b3] text-white"
-                      : " text-black"
+                  className={`p-3 rounded-lg ${
+                    message.type === "user"
+                      ? "bg-blue-500 text-white"
+                      : "bg-white"
                   }`}
                 >
-                  <ReactMarkdown>{content}</ReactMarkdown>
+                  {message.content}
                 </div>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
-        {/* <div className="flex space-x-3 p-4">
+      </main>
+      <footer className="bg-white border-t p-4">
+        <div className="max-w-3xl mx-auto flex items-center space-x-2">
           <textarea
             type="text"
             value={input}
-            onChange={handleInputChange}
-            onKeyDown={handleKeyDown}
+            onChange={(e) => setInput(e.target.value)}
             placeholder="Escribe tu mensaje aquí..."
-            className="flex-grow px-5 py-3 border rounded-3xl focus:outline-none focus:ring focus:ring[#0066b3]"
-          />
-          <Button Icon={TbSend} onClick={handleSubmit} />
-        </div> */}
-        {/* 
-        <div className="p-4 border-t">
-          <div className="flex items-end space-x-4">
-            <div className="flex-grow">
-              <textarea
-                ref={textareaRef}
-                value={input}
-                onChange={handleInputChange}
-                placeholder="Escribe tu mensaje aquí..."
-                className="w-full p-2 pr-10 border rounded-3xl resize-none overflow-hidden bg-white"
-                style={{
-                  minHeight: "23px",
-                  maxHeight: "160px",
-                  lineHeight: "20px",
-                }}
-              />
-            </div>
-            <button 
-                onClick={handleSubmit}
-                className="px-4 py-2 bg-[#0066b3] text-white rounded-full hover:bg-[#005092] transition-colors h-10 w-10 flex items-center justify-center flex-shrink-0"
-              >
-                <TbSend className="h-5 w-5" />
-              </button>
-          </div> */}
-
-        {/* <div className="flex items-end space-x-3 p-4 bg-gray-100 rounded-lg">
-          <textarea
-            ref={textareaRef}
-            value={input}
-            onChange={handleInputChange}
-            onKeyDown={handleKeyDown}
-            placeholder="Escribe tu mensaje aquí..."
-            className="flex-grow px-4 py-3 border rounded-3xl focus:outline-none focus:ring focus:ring-blue-500 resize-none overflow-hidden max-h-40 bg-white text-black"
-            rows={1} // Tamaño inicial
-            style={{ height: "auto", minHeight: "48px" }} // Ajusta el textarea a su contenido
+            className="flex-grow p-2 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500 "
+            onKeyPress={(e) => e.key === "Enter" && handleSend()}
           />
           <button
             onClick={handleSubmit}
-            className="px-4 py-2 bg-blue-500 text-white rounded-full flex-shrink-0"
+            className="bg-blue-500 text-white p-2 rounded-r-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-                <TbSend className="h-5 w-5" />
+            <Send className="h-6 w-6" />
           </button>
-        </div> */}
-
-        <div className="p-4">
-          <div className=" flex bg-gray-700 rounded-3xl">
-            {/* <button className="p-2 text-gray-400 hover:text-white transition-colors">
-              <TbSend className="h-5 w-5" />
-            </button> */}
-            {/* <div className="flex-grow ">
-              <textarea
-                ref={textareaRef}
-                value={input}
-                onChange={handleInputChange}
-                placeholder="Mensaje ABSA"
-                className="w-full bg-transparent text-white placeholder-gray-400 py-2 px-5 outline-none resize-none overflow-y-auto"
-                style={{
-                  minHeight: "20px",
-                  maxHeight: "96px",
-                }}
-              />
-            </div> */}
-
-            {/* <div className="flex-grow"> */}
-              <textarea
-                ref={textareaRef}
-                value={input}
-                onChange={handleInputChange}
-                onKeyDown={handleKeyDown}
-                placeholder="Escribe tu mensaje aquí..."
-                className="w-full bg-transparent text-white placeholder-gray-400 py-3 px-5 outline-none resize-none  custom-scrollbar"
-                style={{
-                  minHeight: "20px",
-                  maxHeight: "96px",
-                }}
-              />
-            {/* </div> */}
-            <button
-              onClick={handleSubmit}
-              className="p-4 text-gray-400 hover:text-white hover:background-color transition-colors self-end cursor-pointer "
-              disabled={!input.trim()}
-            >
-              <TbSend className="h-5 w-5" />
-            </button>
-          </div>
         </div>
-      </div>
-    </main>
+      </footer>
+    </>
   );
 }
