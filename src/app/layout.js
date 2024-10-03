@@ -1,12 +1,18 @@
 import "./globals.css";
 
-import { Rubik } from "@next/font/google";
+import { Rubik, Poppins } from "@next/font/google";
 import Header from "../components/Header";
 
 const rubik = Rubik({
   subsets: ["latin"], // Subconjuntos de caracteres
   weight: ["400", "500", "700"], // Pesos que quieras usar
 });
+
+const poppins = Poppins({
+  subsets: ["latin"], // Subconjuntos de caracteres
+  weight: ["400", "500", "700"], // Pesos que quieras usar
+});
+
 
 export const metadata = {
   title: "ABSA",
@@ -19,9 +25,9 @@ export default function RootLayout({ children }) {
     <html lang="es">
       <body
         // className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        className={rubik.className}
+        className={poppins.className}
       >
-        <div className="flex flex-col h-screen custom-scrollbar">
+        <div className="flex flex-col h-screen custom-scrollbar bg-gray-100">
           <Header />
           {children}
         </div>
