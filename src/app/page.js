@@ -1,134 +1,88 @@
-// import Image from "next/image";
-
-// export default function Home() {
-//   return (
-//     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-//       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-//         <Image
-//           className="dark:invert"
-//           src="https://nextjs.org/icons/next.svg"
-//           alt="Next.js logo"
-//           width={180}
-//           height={38}
-//           priority
-//         />
-//         <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-//           <li className="mb-2">
-//             Get started by editing{" "}
-//             <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-//               src/app/page.js
-//             </code>
-//             .
-//           </li>
-//           <li>Save and see your changes instantly.</li>
-//         </ol>
-
-//         <div className="flex gap-4 items-center flex-col sm:flex-row">
-//           <a
-//             className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-//             href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-//             target="_blank"
-//             rel="noopener noreferrer"
-//           >
-//             <Image
-//               className="dark:invert"
-//               src="https://nextjs.org/icons/vercel.svg"
-//               alt="Vercel logomark"
-//               width={20}
-//               height={20}
-//             />
-//             Deploy now
-//           </a>
-//           <a
-//             className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-//             href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-//             target="_blank"
-//             rel="noopener noreferrer"
-//           >
-//             Read our docs
-//           </a>
-//         </div>
-//       </main>
-//       <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-//         <a
-//           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-//           href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-//           target="_blank"
-//           rel="noopener noreferrer"
-//         >
-//           <Image
-//             aria-hidden
-//             src="https://nextjs.org/icons/file.svg"
-//             alt="File icon"
-//             width={16}
-//             height={16}
-//           />
-//           Learn
-//         </a>
-//         <a
-//           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-//           href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-//           target="_blank"
-//           rel="noopener noreferrer"
-//         >
-//           <Image
-//             aria-hidden
-//             src="https://nextjs.org/icons/window.svg"
-//             alt="Window icon"
-//             width={16}
-//             height={16}
-//           />
-//           Examples
-//         </a>
-//         <a
-//           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-//           href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-//           target="_blank"
-//           rel="noopener noreferrer"
-//         >
-//           <Image
-//             aria-hidden
-//             src="https://nextjs.org/icons/globe.svg"
-//             alt="Globe icon"
-//             width={16}
-//             height={16}
-//           />
-//           Go to nextjs.org →
-//         </a>
-//       </footer>
-//     </div>
-//   );
-// }
-
 "use client";
-
+import Button from "@/components/Button";
 import { useChat } from "ai/react";
+import { useEffect, useRef } from "react";
+import { TbSend } from "react-icons/tb";
+import ReactMarkdown from "react-markdown";
+export default function Component() {
+  const { messages, input, handleInputChange, handleSubmit } = useChat({});
+  const textareaRef = useRef(null);
 
-export default function Chat() {
-  const { messages, input, handleInputChange, handleSubmit } = useChat({
-    // headers: {
-    //   // Authorization: "your_token",
-    //   Authorization: `Bearer ${process.env.NEXT_PUBLIC_OPENAI_API_KEY}`,
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "20px";
+      const scrollHeight = textareaRef.current.scrollHeight;
+      textareaRef.current.style.height =
+        scrollHeight > 96 ? "96px" : `${scrollHeight}px`;
+    }
+  }, [input]);
 
-    // },
-  });
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault(); // Evitar que se añada un salto de línea
+      handleSubmit(); // Enviar el mensaje
+    } else if (e.key === "Enter" && e.shiftKey) {
+      // Permitir el salto de línea
+      setInput(input + "\n");
+    }
+  };
+
   return (
-    <div className="flex flex-col w-full max-w-md py-24 mx-auto stretch">
-      {messages.map((m) => (
-        <div key={m.id} className="whitespace-pre-wrap">
-          {m.role === "user" ? "User: " : "AI: "}
-          {m.content}
-        </div>
-      ))}
+    <main className="flex-grow overflow-hidden">
+      {/* <div className="h-full  flex flex-col container mx-auto px-6"> */}
+      <div className="h-full flex flex-col max-w-4xl mx-auto px-4">
+        <div className="flex-grow p-4 overflow-y-auto">
+          {messages.map((message, index) => {
+            const content =
+              typeof message.content === "string"
+                ? message.content
+                : JSON.stringify(message.content); // Convierte el objeto a string si es necesario
 
-      <form onSubmit={handleSubmit}>
-        <input
-          className="fixed bottom-0 w-full max-w-md p-2 mb-8 border border-gray-300 rounded shadow-xl"
-          value={input}
-          placeholder="Say something..."
-          onChange={handleInputChange}
-        />
-      </form>
-    </div>
+            return (
+              <div
+                key={index}
+                className={`mb-4 ${
+                  message.role === "user" ? "text-right" : "text-left"
+                }`}
+              >
+                <div
+                  className={`inline-block px-4 py-2 rounded-2xl ${
+                    message.role === "user"
+                      ? "bg-[#0066b3] text-white"
+                      : " text-black"
+                  }`}
+                >
+                  <ReactMarkdown>{content}</ReactMarkdown>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <div className="p-4">
+          <div className=" flex bg-[#0066b3] rounded-3xl">
+              <textarea
+                ref={textareaRef}
+                value={input}
+                onChange={handleInputChange}
+                onKeyDown={handleKeyDown}
+                placeholder="Escribe tu mensaje aquí..."
+                className="w-full bg-transparent text-white placeholder-white-100 py-3 px-5 outline-none resize-none  custom-scrollbar"
+                style={{
+                  minHeight: "20px",
+                  maxHeight: "96px",
+                }}
+              />
+            {/* </div> */}
+            <button
+              onClick={handleSubmit}
+              className="p-4 text-gray-400 hover:text-white rounded-full transition-colors self-end cursor-pointer "
+              disabled={!input.trim()}
+            >
+              <TbSend className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
   );
 }
